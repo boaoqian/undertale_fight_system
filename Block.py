@@ -1,5 +1,7 @@
 import pygame
+from attack import *
 from Heart import *
+import numpy as np
 
 class TextClass:
     def __init__(self, font, text, color=[255,255,255]):
@@ -33,17 +35,20 @@ class State_Bar:
         lv_text = self.font.render(f'LV {lv}', 0, self.color)
         hp_text = self.font.render(f'HP {hp[0]}/{hp[1]}', 0, self.color)
 
+        self.lv = lv
+        self.hp = hp
+
         pygame.draw.rect(self.surface, [255,215,0], [self.hp_bar_w[0],(40-self.hp_bar_h)//2,(self.bar_legth)*hp[0]//hp[1],self.hp_bar_h], 0) #画hp条【300-500px】
         lv_pos = lv_text.get_rect()[-2]
         self.surface.blit(lv_text,[self.text_bar_w[0]-lv_pos,0])
         self.surface.blit(hp_text,[self.text_bar_w[1],0])
 
     # 状态栏
-    def update_state(self, lv, hp=[]):
+    def update_state(self):
         self.surface.fill([0,0,0])
-        lv_text = self.font.render(f'LV {lv}', 0, self.color)
-        hp_text = self.font.render(f'HP {hp[0]}/{hp[1]}', 0, self.color)
-        pygame.draw.rect(self.surface, [255,215,0], [self.hp_bar_w[0],(40-self.hp_bar_h)//2,(self.bar_legth)*hp[0]//hp[1],self.hp_bar_h], 0) #画hp条【300-500px】
+        lv_text = self.font.render(f'LV {self.lv}', 0, self.color)
+        hp_text = self.font.render(f'HP {self.hp[0]}/{self.hp[1]}', 0, self.color)
+        pygame.draw.rect(self.surface, [255,215,0], [self.hp_bar_w[0],(40-self.hp_bar_h)//2,(self.bar_legth)*self.hp[0]//self.hp[1],self.hp_bar_h], 0) #画hp条【300-500px】
         lv_pos = lv_text.get_rect()[-2]
         self.surface.blit(lv_text,[self.text_bar_w[0]-lv_pos,0])
         self.surface.blit(hp_text,[self.text_bar_w[1],0])
@@ -55,6 +60,7 @@ class Avoid_Scene:
         pos: heart的初始位置\n
         self.surface是区块结果
         '''
+        self.HP = 76
         self.color = [255,255,255]
         self.f_size = size #区域大小
         self.bk = bk #越大，可动区相对区域越小
@@ -62,7 +68,11 @@ class Avoid_Scene:
         self.bk = [bk[0]//2,bk[1]//2]   #保证可动区居中
         heart_path = 'Static/red_heart.png'
         
-        self.heart = Heart(heart_path,76,(self.size[0]/2,self.size[1]/2))
+        #资源
+        self.playerdamaged = pygame.mixer.Sound('Static/playerdamaged.ogg')
+
+        # heart 初始化
+        self.heart = Heart(heart_path,self.HP,(self.size[0]/2,self.size[1]/2))
         self.heart.pos=pos
         pos = self.heart.target_pos(self.heart.pos)
         heart_size = self.heart.heart_img.get_rect()[-2:]
@@ -73,9 +83,30 @@ class Avoid_Scene:
         self.surface = pygame.surface.Surface(self.size)
         pygame.draw.rect(self.surface,[255,255,255],(0,0,self.size[0],self.size[1]),5) #surface,color,pos,widht
 
+        # 子弹初始化
+        bullet_num = 12
+        self.bullet_size = 10
+        self.bullet_group = []
+        for _ in range(bullet_num):
+            bullet = Basic_bullet(self.available_area,self.bullet_size)
+            bullet.setup(self.surface)
+            self.bullet_group.append(bullet)
+
+        #碰撞检测中的r
+        self.r = (heart_size[0]/2+self.bullet_size/2)**2
+
         self.surface.blit(self.heart.heart_img,pos)
         self.full_area_surface.blit(self.surface,self.bk)
 
+    # 碰撞检测 
+    def collision(self,pos_1,pos_2):
+        p1 = np.array(pos_1)
+        p2 = np.array(pos_2)
+        d = np.sum(np.power(p1-p2,2))
+        if d < self.r:
+            return True
+        else:
+            return False
 
     def update(self,d_x,d_y):
         '''
@@ -90,19 +121,29 @@ class Avoid_Scene:
                 self.heart.pos[i] = self.available_area[i]
             elif p > self.available_area[i+2]:
                 self.heart.pos[i] = self.available_area[i+2]
+        
         self.surface.fill([0,0,0])
         self.full_area_surface.fill([0,0,0])
         pygame.draw.rect(self.surface,[255,255,255],(0,0,self.size[0],self.size[1]),5) #surface,color,pos,widht
         pos = self.heart.target_pos(self.heart.pos)
 
+        # 子弹更新
+        for i, bullet in enumerate(self.bullet_group):
+            if self.collision(bullet.pos,self.heart.pos):
+                self.bullet_group[i].out=True
+                self.heart.HP -= 3
+                self.playerdamaged.stop()
+                self.playerdamaged.play()
+                
+            if bullet.out:
+                bullet = Basic_bullet(self.available_area, self.bullet_size)
+                bullet.setup(self.surface)
+                self.bullet_group[i] = bullet
+            
+            bullet.action(self.surface)
+
+        
         self.surface.blit(self.heart.heart_img,pos)
         self.full_area_surface.blit(self.surface,self.bk)
 
         
-
-
-
-
-    
-
-

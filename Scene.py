@@ -1,3 +1,4 @@
+from attack import Basic_bullet
 from typing import Text, final
 import pygame
 from Block import *
@@ -121,7 +122,6 @@ def avoid_draw():
     surface.blit(heart.heart_img, pos)
     return surface
 
-
 # 躲避攻击的场景
 def avoid(clock, fps, screen, font, lv=23, hp=[76, 76]):
     screen.fill([0, 0, 0])
@@ -129,8 +129,9 @@ def avoid(clock, fps, screen, font, lv=23, hp=[76, 76]):
     state_bar_pos = (40, 600-60)  # 间隙10+hp_bar宽
     screen.blit(state_bar.surface, state_bar_pos)
 
-    avoid_scene = Avoid_Scene((800,400),[250,200])
-    avoid_scene_pos = [400-avoid_scene.f_size[0]//2, state_bar_pos[1]-avoid_scene.f_size[1]-10]
+    avoid_scene = Avoid_Scene((800, 400), [250, 200])
+    avoid_scene_pos = [400-avoid_scene.f_size[0]//2,
+                       state_bar_pos[1]-avoid_scene.f_size[1]-10]
     screen.blit(avoid_scene.full_area_surface, avoid_scene_pos)
     pygame.mixer.music.load('Static/MEGALOVANIA.wav')
     pygame.mixer.music.play()
@@ -139,41 +140,38 @@ def avoid(clock, fps, screen, font, lv=23, hp=[76, 76]):
     pygame.display.flip()
 
     Running = True
-    press = [0,0] # up down ;right left
+    press = [0, 0]  # up down ;right left
     while Running:
         clock.tick(fps)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 Running = False
 
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_UP and press[1] == 1:
-                    press[1] = 0             
+                    press[1] = 0
                 elif event.key == pygame.K_DOWN and press[1] == -1:
                     press[1] = 0
                 elif event.key == pygame.K_LEFT and press[0] == -1:
-                    press[0] = 0          
+                    press[0] = 0
                 elif event.key == pygame.K_RIGHT and press[0] == 1:
                     press[0] = 0
 
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
-                    press[1] = 1              
+                    press[1] = 1
                 elif event.key == pygame.K_DOWN:
                     press[1] = -1
                 elif event.key == pygame.K_LEFT:
-                    press[0] = -1          
+                    press[0] = -1
                 elif event.key == pygame.K_RIGHT:
                     press[0] = 1
-        if press[0] != 0 or press[1] != 0 :
-            avoid_scene.update(press[0],press[1])
-            screen.blit(avoid_scene.full_area_surface, avoid_scene_pos)
-            pygame.display.flip()
+        state_bar.hp[0] = avoid_scene.heart.HP
+        state_bar.update_state()
+        avoid_scene.update(press[0], press[1])  
+        screen.blit(avoid_scene.full_area_surface, avoid_scene_pos)
+        screen.blit(state_bar.surface, state_bar_pos)
+        pygame.display.flip()
 
     pygame.quit()
-
-# pygame.init()
-# font = pygame.font.Font('Static/8bitoperator_jve.ttf',40)
-# img=Avoid_Scene()
-# img.update()
-# pygame.image.save(img.surface,"test.png") #这句话保存图片

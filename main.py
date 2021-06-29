@@ -25,7 +25,7 @@ screen.fill([0,0,0])
 
 def main(screen, clock, fps, font):
     starting(clock,fps,screen,font)
-    menu(clock,fps,screen,font)
+    # menu(clock,fps,screen,font)
     avoid(clock,fps,screen,font)
     #menu(clock,fps,screen,font)
 
