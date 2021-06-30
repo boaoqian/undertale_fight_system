@@ -107,6 +107,7 @@ class Avoid_Scene:
         pos: heart的初始位置\n
         self.surface是区块结果
         '''
+        self.pass = False 
         self.HP = 76
         self.color = [255,255,255]
         self.f_size = size #区域大小
