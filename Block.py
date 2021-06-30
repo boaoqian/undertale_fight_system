@@ -101,8 +101,9 @@ class State_Bar:
         self.surface.blit(hp_text,[self.text_bar_w[1],0])
 
 class Avoid_Scene:
-    def __init__(self,size=[300,300],hp=76,pos=[150,150],bk=[50,50]) -> None:
+    def __init__(self,bullet_set=[10,8,1,0],size=[300,300],hp=76,pos=[150,150],bk=[50,50]) -> None:
         '''
+        bullet_set:[0]子弹个数[1]子弹大小[2]子弹伤害[3]帧伤(默认关闭)
         size: 区域大小
         pos: heart的初始位置\n
         self.surface是区块结果
@@ -132,10 +133,9 @@ class Avoid_Scene:
         pygame.draw.rect(self.surface,[255,255,255],(0,0,self.size[0],self.size[1]),5) #surface,color,pos,widht
 
         # 子弹初始化
-        bullet_num = 10
-        self.bullet_size = 8
-        self.bullet_num_sum = 100
-        self.bullet_num_out = 0
+        self.bullet_set = bullet_set
+        bullet_num = bullet_set[0]
+        self.bullet_size = bullet_set[1]
         self.bullet_group = []
         for _ in range(bullet_num):
             bullet = Basic_bullet(self.available_area,self.bullet_size)
@@ -169,22 +169,17 @@ class Avoid_Scene:
         # 子弹更新
         for i, bullet in enumerate(self.bullet_group):
             if bullet.collision(self.heart.pos):
-                self.bullet_group[i].out=True
-                self.heart.HP -= 3
+                if self.bullet_set[3]:
+                    self.bullet_group[i].out
+                self.heart.HP -= self.bullet_set[2]
                 self.playerdamaged.stop()
                 self.playerdamaged.play()
                 
             if bullet.out:
-                self.bullet_num_out+=1
                 bullet = Basic_bullet(self.available_area, self.bullet_size)
                 bullet.setup(self.surface,self.heart_size)
                 self.bullet_group[i] = bullet
-            
             bullet.action(self.surface)
-        if self.bullet_num_out >= self.bullet_num_sum:
-            self.success_pass = True
-
-        
         self.surface.blit(self.heart.heart_img,pos)
         self.full_area_surface.blit(self.surface,self.bk)
 

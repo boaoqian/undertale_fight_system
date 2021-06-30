@@ -30,11 +30,6 @@ def main(screen, clock, fps):
         selet = menu(clock,fps,screen,hp=[hp,76])
         scene[selet](clock,fps,screen)
         hp = avoid(clock,fps,screen,hp)
-        print(hp)
-
-    pygame.quit()
-
-
 
 if __name__ == '__main__':
     main(screen, clock, fps)

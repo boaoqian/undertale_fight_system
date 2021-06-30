@@ -3,6 +3,7 @@ from typing import Text, final
 import pygame
 from Block import *
 from Heart import *
+import time
 # 开场白
 
 
@@ -44,11 +45,14 @@ def starting(clock, fps, screen):
     pygame.display.flip()
     pygame.mixer.music.stop()
 
+
 def get_font_size(font, text):
     text = font.render(text, 0, [0, 0, 0])
     return text.get_rect()[-2:]
 
 # 选项
+
+
 def op(font, selet):
 
     op_list = ['FIGHT', 'ACT', 'ITEM', 'MERCY']
@@ -69,6 +73,8 @@ def op(font, selet):
     return op_surface
 
 # 菜单界面（待完善）
+
+
 def quit_now():
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -76,7 +82,10 @@ def quit_now():
 
 
 def menu(clock, fps, screen, lv=23, hp=[76, 76]):
+
     font = pygame.font.Font('Static/8bitoperator_jve.ttf', 40)
+    MenuSelect = pygame.mixer.Sound('Static/MenuSelect.ogg')
+    MenuCursor = pygame.mixer.Sound('Static/MenuCursor.ogg')
     selet = 0
     screen.fill([0, 0, 0])
     menu = op(font, selet)
@@ -90,8 +99,8 @@ def menu(clock, fps, screen, lv=23, hp=[76, 76]):
     clock.tick(fps)
     pygame.display.flip()
 
-    text_block = Menu_Text(font,1)
-    text_block_pos = [50, state_bar_pos[-1]-60 -
+    text_block = Menu_Text(font, 1)
+    text_block_pos = [50, state_bar_pos[-1] -
                       text_block.rect[-1]]  # 位置hp_bar宽40-10-self.h
     text = 'welcome to play'
     text_block.write(text)
@@ -108,16 +117,19 @@ def menu(clock, fps, screen, lv=23, hp=[76, 76]):
                 pygame.quit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
+                    MenuSelect.play()
                     Running = False
                     screen.fill([0, 0, 0])
                     pygame.display.flip()
                     return selet
-                
+
                 elif event.key == pygame.K_RIGHT:
+                    MenuCursor.play()
                     selet += 1
                     if selet > 3:
                         selet = 0
                 elif event.key == pygame.K_LEFT:
+                    MenuCursor.play()
                     selet -= 1
                     if selet < 0:
                         selet = 3
@@ -126,7 +138,6 @@ def menu(clock, fps, screen, lv=23, hp=[76, 76]):
                 screen.blit(menu, (40, 600-menu_h-10))
                 # screen.blit(state_bar.surface, state_bar_pos)
                 pygame.display.flip()
-
 
 
 # 画场景和心
@@ -144,19 +155,21 @@ def avoid_draw():
 # 躲避攻击的场景
 
 
-def avoid(clock, fps, screen,hp=76):
+def avoid(clock, fps, screen, hp=76):
     screen.fill([0, 0, 0])
-    state_bar = State_Bar(hp=[hp,76])
+    state_bar = State_Bar(hp=[hp, 76])
     state_bar_pos = (40, 600-60)  # 间隙10+hp_bar宽
     screen.blit(state_bar.surface, state_bar_pos)
 
-    avoid_scene = Avoid_Scene((400, 400), hp, [200, 200])
+    #初始化avoid_scene
+    avoid_scene = Avoid_Scene([10,8,1,1],(400, 400), hp, [200, 200])
     avoid_scene_pos = [400-avoid_scene.f_size[0]//2,
                        state_bar_pos[1]-avoid_scene.f_size[1]-10]
     screen.blit(avoid_scene.full_area_surface, avoid_scene_pos)
     pygame.mixer.music.load('Static/MEGALOVANIA.wav')
     pygame.mixer.music.play()
-
+    start_time = time.time()
+    finish_time = 10 # 游戏时间
     clock.tick(fps)
     pygame.display.flip()
 
@@ -194,9 +207,9 @@ def avoid(clock, fps, screen,hp=76):
         screen.blit(avoid_scene.full_area_surface, avoid_scene_pos)
         screen.blit(state_bar.surface, state_bar_pos)
         pygame.display.flip()
-        if avoid_scene.success_pass:
+        if time.time()-start_time >= finish_time:
             pygame.mixer.music.stop()
-            Running=False
+            Running = False
             return avoid_scene.heart.HP
 
 
