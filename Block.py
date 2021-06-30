@@ -23,6 +23,53 @@ class TextClass:
             return pos
 
 
+class Menu_Text:
+    def __init__(self, font,speed=2,rect=[0,0,700,200] ,color=[255,255,255]) -> None:
+        #写字
+        self.font = font
+        
+        self.color = color
+        self.speed = speed # 越大越慢
+        self.rect = rect
+        self.surface = pygame.surface.Surface(self.rect[-2:]) #背景
+        self.surface.fill([0,0,0])
+        self.text_pos = [0,0]
+        self.font_size = self.get_font_size('a') #字宽
+
+        #画
+        self.text_surface = pygame.surface.Surface((self.rect[-2]-20,self.rect[-1]-20)) #写字区
+        pygame.draw.rect(self.surface, color, self.rect,5)
+    
+
+    def get_font_size(self, text):
+        text = self.font.render(text, 0, [0, 0, 0])
+        return text.get_rect()[-2:]
+
+    def clean(self):
+        self.text_pos=[0,0]
+        self.text_surface.fill([0,0,0])
+    
+    def write_letter(self, letter):
+        if self.rect[-2]-self.text_pos[0] < self.font_size[0]:
+            self.text_pos=[0,self.text_pos[1]+self.font_size[1]]
+        self.text_pos[0]=self.font_size[0]+self.text_pos[0]+3
+        text_img = self.font.render(letter, 0, self.color)
+        self.text_surface.blit(text_img,self.text_pos)
+        self.surface.blit(self.text_surface,[10,10])
+    
+    def write(self, text):
+        for t in text:
+            if self.rect[-2]-self.text_pos[0] < self.font_size[0]:
+                self.text_pos=[0,self.text_pos[1]+self.font_size[1]]
+            self.text_pos[0]=self.font_size[0]+self.text_pos[0]+3
+            text_img = self.font.render(t, 0, self.color)
+            self.text_surface.blit(text_img,self.text_pos)
+        self.surface.blit(self.text_surface,[10,10])
+        
+
+
+      
+
 class State_Bar:
     def __init__(self,lv=23,hp=[76,76]):
         self.color = [255,255,255]
@@ -135,4 +182,3 @@ class Avoid_Scene:
         self.surface.blit(self.heart.heart_img,pos)
         self.full_area_surface.blit(self.surface,self.bk)
 
-        

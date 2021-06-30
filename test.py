@@ -1,6 +1,6 @@
 import pygame
 import time
+from Block import *
 pygame.init()
-playerdamaged = pygame.mixer.Sound('Static/playerdamaged.ogg')
-playerdamaged.play()
-time.sleep(1)
+font = pygame.font.Font('Static/8bitoperator_jve.ttf',40)
+a = Menu_Text(font,3)

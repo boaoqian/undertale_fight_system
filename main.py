@@ -11,7 +11,6 @@ clock = pygame.time.Clock()   #创建一个时间对象
 
 #资源
 icon = pygame.image.load('Static/red_heart_big.png')
-font = pygame.font.Font('Static/8bitoperator_jve.ttf',40)
 bgm = pygame.mixer.music.load('Static/onceupatime.wav')
 color = [200,200,200]
 
@@ -21,14 +20,17 @@ pygame.display.set_caption('undertale_FightSystem')
 screen = pygame.display.set_mode((800,600)) #不可变
 screen.fill([0,0,0])
 
+scene = [fight,act,item,mercy]
 #主逻辑
 
-def main(screen, clock, fps, font):
-    starting(clock,fps,screen,font)
-    # menu(clock,fps,screen,font)
-    avoid(clock,fps,screen,font)
-    #menu(clock,fps,screen,font)
+def main(screen, clock, fps):
+    starting(clock,fps,screen)
+    selet = menu(clock,fps,screen)
+    scene[selet](clock,fps,screen)
+    #avoid(clock,fps,screen)
+    pygame.quit()
+
 
 
 if __name__ == '__main__':
-    main(screen, clock, fps, font)
+    main(screen, clock, fps)

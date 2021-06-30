@@ -6,7 +6,8 @@ from Heart import *
 # 开场白
 
 
-def starting(clock, fps, screen, font):
+def starting(clock, fps, screen):
+    font = pygame.font.Font('Static/8bitoperator_jve.ttf', 40)
     color = [200, 200, 200]
     text = TextClass(font, 'Press A Key To Start', color)
     screen.blit(text.img, text.target_pos())
@@ -43,14 +44,11 @@ def starting(clock, fps, screen, font):
     pygame.display.flip()
     pygame.mixer.music.stop()
 
-
 def get_font_size(font, text):
     text = font.render(text, 0, [0, 0, 0])
     return text.get_rect()[-2:]
 
 # 选项
-
-
 def op(font, selet):
 
     op_list = ['FIGHT', 'ACT', 'ITEM', 'MERCY']
@@ -71,9 +69,14 @@ def op(font, selet):
     return op_surface
 
 # 菜单界面（待完善）
+def quit_now():
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
 
 
-def menu(clock, fps, screen, font, lv=23, hp=[76, 76]):
+def menu(clock, fps, screen, lv=23, hp=[76, 76]):
+    font = pygame.font.Font('Static/8bitoperator_jve.ttf', 40)
     selet = 0
     screen.fill([0, 0, 0])
     menu = op(font, selet)
@@ -86,14 +89,31 @@ def menu(clock, fps, screen, font, lv=23, hp=[76, 76]):
 
     clock.tick(fps)
     pygame.display.flip()
+
+    text_block = Menu_Text(font,1)
+    text_block_pos = [50, state_bar_pos[-1]-60 -
+                      text_block.rect[-1]]  # 位置hp_bar宽40-10-self.h
+    text = 'welcome to play'
+    text_block.write(text)
+    screen.blit(text_block.surface, text_block_pos)
+    pygame.display.flip()
+
+    # 玩家时间
     Running = True
     while Running:
+        clock.tick(fps)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 Running = False
                 pygame.quit()
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_RETURN:
+                    Running = False
+                    screen.fill([0, 0, 0])
+                    pygame.display.flip()
+                    return selet
+                
+                elif event.key == pygame.K_RIGHT:
                     selet += 1
                     if selet > 3:
                         selet = 0
@@ -101,13 +121,12 @@ def menu(clock, fps, screen, font, lv=23, hp=[76, 76]):
                     selet -= 1
                     if selet < 0:
                         selet = 3
-                screen.fill([0, 0, 0])
                 menu = op(font, selet)
                 menu_h = menu.get_rect()[-1]
                 screen.blit(menu, (40, 600-menu_h-10))
-                screen.blit(state_bar.surface, state_bar_pos)
+                # screen.blit(state_bar.surface, state_bar_pos)
                 pygame.display.flip()
-        clock.tick(fps)
+
 
 
 # 画场景和心
@@ -123,6 +142,8 @@ def avoid_draw():
     return surface
 
 # 躲避攻击的场景
+
+
 def avoid(clock, fps, screen, font, lv=23, hp=[76, 76]):
     screen.fill([0, 0, 0])
     state_bar = State_Bar()
@@ -168,9 +189,25 @@ def avoid(clock, fps, screen, font, lv=23, hp=[76, 76]):
                     press[0] = 1
         state_bar.hp[0] = avoid_scene.heart.HP
         state_bar.update_state()
-        avoid_scene.update(press[0], press[1])  
+        avoid_scene.update(press[0], press[1])
         screen.blit(avoid_scene.full_area_surface, avoid_scene_pos)
         screen.blit(state_bar.surface, state_bar_pos)
         pygame.display.flip()
 
     pygame.quit()
+
+
+def fight(clock, fps, screen):
+    pass
+
+
+def act(clock, fps, screen):
+    pass
+
+
+def item(clock, fps, screen):
+    pass
+
+
+def mercy(clock, fps, screen):
+    pass
