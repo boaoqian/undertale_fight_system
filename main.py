@@ -24,10 +24,14 @@ scene = [fight,act,item,mercy]
 #主逻辑
 
 def main(screen, clock, fps):
+    hp = 76
     starting(clock,fps,screen)
-    selet = menu(clock,fps,screen)
-    scene[selet](clock,fps,screen)
-    #avoid(clock,fps,screen)
+    while True:
+        selet = menu(clock,fps,screen,hp=[hp,76])
+        scene[selet](clock,fps,screen)
+        hp = avoid(clock,fps,screen,hp)
+        print(hp)
+
     pygame.quit()
 
 

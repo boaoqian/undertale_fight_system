@@ -101,14 +101,14 @@ class State_Bar:
         self.surface.blit(hp_text,[self.text_bar_w[1],0])
 
 class Avoid_Scene:
-    def __init__(self,size=[300,300],pos=[150,150],bk=[50,50]) -> None:
+    def __init__(self,size=[300,300],hp=76,pos=[150,150],bk=[50,50]) -> None:
         '''
         size: 区域大小
         pos: heart的初始位置\n
         self.surface是区块结果
         '''
-        self.pass = False 
-        self.HP = 76
+        self.HP = hp
+        self.success_pass = False
         self.color = [255,255,255]
         self.f_size = size #区域大小
         self.bk = bk #越大，可动区相对区域越小
@@ -132,8 +132,10 @@ class Avoid_Scene:
         pygame.draw.rect(self.surface,[255,255,255],(0,0,self.size[0],self.size[1]),5) #surface,color,pos,widht
 
         # 子弹初始化
-        bullet_num = 20
+        bullet_num = 10
         self.bullet_size = 8
+        self.bullet_num_sum = 100
+        self.bullet_num_out = 0
         self.bullet_group = []
         for _ in range(bullet_num):
             bullet = Basic_bullet(self.available_area,self.bullet_size)
@@ -173,11 +175,14 @@ class Avoid_Scene:
                 self.playerdamaged.play()
                 
             if bullet.out:
+                self.bullet_num_out+=1
                 bullet = Basic_bullet(self.available_area, self.bullet_size)
                 bullet.setup(self.surface,self.heart_size)
                 self.bullet_group[i] = bullet
             
             bullet.action(self.surface)
+        if self.bullet_num_out >= self.bullet_num_sum:
+            self.success_pass = True
 
         
         self.surface.blit(self.heart.heart_img,pos)
