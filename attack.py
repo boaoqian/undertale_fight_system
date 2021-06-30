@@ -1,5 +1,6 @@
 import pygame
 import random
+import numpy as np
 
 class Basic_bullet(pygame.sprite.Sprite):
     def __init__(self, available_area,size=20) -> None:
@@ -11,11 +12,11 @@ class Basic_bullet(pygame.sprite.Sprite):
         self.bullet = pygame.surface.Surface([self.size]*2) #子弹图像
         self.available_area = available_area
         self.pos = [0,0]
-        self.speed = [random.randrange(-4,4),random.randrange(-4,4)]
+        self.speed = [random.randrange(-10,10),random.randrange(-10,10)]
         self.bullet.fill(color)
         self.out = False
 
-    def setup(self,surface,pos=None):
+    def setup(self,surface,heart_size,pos=None):
         '''
         surface:传入Avoid_Scene对象\n
         pos：初始位置\n
@@ -24,12 +25,23 @@ class Basic_bullet(pygame.sprite.Sprite):
         if pos == None:
             pos = [random.randint(self.available_area[0],self.available_area[2]),
                     random.randint(self.available_area[1],self.available_area[3])]  
-        if self.speed[0] == 0 and self.speed[1] == 0:
-            self.speed = [random.randrange(-4,4),random.randrange(-4,4)]
 
         self.pos[0] = pos[0]
         self.pos[1] = pos[1]
         surface.blit(self.bullet,pos)
+
+        #碰撞检测中的r
+        self.r = (heart_size[0]/2+self.size/2)**2
+
+    # 碰撞检测 
+    def collision(self,heart_pos):
+        p1 = np.array(self.pos)
+        p2 = np.array(heart_pos)
+        d = np.sum(np.power(p1-p2,2))
+        if d < self.r:
+            return True
+        else:
+            return False
 
     def action(self,surface):
         self.pos[0] += self.speed[0]

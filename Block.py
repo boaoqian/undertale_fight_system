@@ -1,7 +1,7 @@
 import pygame
 from attack import *
 from Heart import *
-import numpy as np
+
 
 class TextClass:
     def __init__(self, font, text, color=[255,255,255]):
@@ -75,38 +75,27 @@ class Avoid_Scene:
         self.heart = Heart(heart_path,self.HP,(self.size[0]/2,self.size[1]/2))
         self.heart.pos=pos
         pos = self.heart.target_pos(self.heart.pos)
-        heart_size = self.heart.heart_img.get_rect()[-2:]
+        self.heart_size = self.heart.heart_img.get_rect()[-2:]
 
         # heart可活动的区域
-        self.available_area=[6+heart_size[0]//2, 6+heart_size[1]//2, self.size[0]-6-heart_size[0]//2,self.size[1]-6-heart_size[1]//2]
+        self.available_area=[6+self.heart_size[0]//2, 6+self.heart_size[1]//2, self.size[0]-6-self.heart_size[0]//2,self.size[1]-6-self.heart_size[1]//2]
         self.full_area_surface = pygame.surface.Surface(self.f_size)
         self.surface = pygame.surface.Surface(self.size)
         pygame.draw.rect(self.surface,[255,255,255],(0,0,self.size[0],self.size[1]),5) #surface,color,pos,widht
 
         # 子弹初始化
-        bullet_num = 12
-        self.bullet_size = 10
+        bullet_num = 20
+        self.bullet_size = 8
         self.bullet_group = []
         for _ in range(bullet_num):
             bullet = Basic_bullet(self.available_area,self.bullet_size)
-            bullet.setup(self.surface)
+            bullet.setup(self.surface,self.heart_size)
             self.bullet_group.append(bullet)
 
-        #碰撞检测中的r
-        self.r = (heart_size[0]/2+self.bullet_size/2)**2
+
 
         self.surface.blit(self.heart.heart_img,pos)
         self.full_area_surface.blit(self.surface,self.bk)
-
-    # 碰撞检测 
-    def collision(self,pos_1,pos_2):
-        p1 = np.array(pos_1)
-        p2 = np.array(pos_2)
-        d = np.sum(np.power(p1-p2,2))
-        if d < self.r:
-            return True
-        else:
-            return False
 
     def update(self,d_x,d_y):
         '''
@@ -129,7 +118,7 @@ class Avoid_Scene:
 
         # 子弹更新
         for i, bullet in enumerate(self.bullet_group):
-            if self.collision(bullet.pos,self.heart.pos):
+            if bullet.collision(self.heart.pos):
                 self.bullet_group[i].out=True
                 self.heart.HP -= 3
                 self.playerdamaged.stop()
@@ -137,7 +126,7 @@ class Avoid_Scene:
                 
             if bullet.out:
                 bullet = Basic_bullet(self.available_area, self.bullet_size)
-                bullet.setup(self.surface)
+                bullet.setup(self.surface,self.heart_size)
                 self.bullet_group[i] = bullet
             
             bullet.action(self.surface)

@@ -129,7 +129,7 @@ def avoid(clock, fps, screen, font, lv=23, hp=[76, 76]):
     state_bar_pos = (40, 600-60)  # 间隙10+hp_bar宽
     screen.blit(state_bar.surface, state_bar_pos)
 
-    avoid_scene = Avoid_Scene((800, 400), [250, 200])
+    avoid_scene = Avoid_Scene((400, 400), [200, 200])
     avoid_scene_pos = [400-avoid_scene.f_size[0]//2,
                        state_bar_pos[1]-avoid_scene.f_size[1]-10]
     screen.blit(avoid_scene.full_area_surface, avoid_scene_pos)
@@ -143,7 +143,6 @@ def avoid(clock, fps, screen, font, lv=23, hp=[76, 76]):
     press = [0, 0]  # up down ;right left
     while Running:
         clock.tick(fps)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 Running = False
