@@ -7,15 +7,15 @@ class Heart(pygame.sprite.Sprite):
         self.rect = self.heart_img.get_rect()
         self.pos = pos
         self.HP = hp
-        self.speed = 5
+        self.speed = 7
         self.Invincible = 0 #受到攻击后的无敌时间
 
     # 裂开的特效（待完善） ；return 是否活着
     def is_dead(self):
         if self.HP <= 0:
-            return False
-        else:
             return True
+        else:
+            return False
 
     # 居中画图
     def target_pos(self, pos):

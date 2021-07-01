@@ -4,6 +4,7 @@ import pygame
 from Block import *
 from Heart import *
 import time
+import numpy as np
 # 开场白
 
 
@@ -153,7 +154,29 @@ def avoid_draw():
     return surface
 
 # 躲避攻击的场景
+def die(screen):
+    screen.fill([0,0,0])
+    s = pygame.mixer.Sound('Static/HeartShatter.ogg')
+    img = pygame.image.load('Static/red_heart.png')
+    s_img = pygame.image.load('Static/s_heart.png')
+    
+    screen.blit(img,[390,290])
+    pygame.display.flip()
+    pygame.time.delay(1000)
+    s.play()
+    screen.fill([0,0,0])
+    screen.blit(s_img,[390,290])
+    pygame.display.flip()
+    pygame.time.delay(1500)
+    screen.fill([0,0,0])
 
+def move(img,pos_0,pos_1,speed):
+    pass
+
+def animation(pos1,pos2,times):
+    for i in range(times):
+        pass
+            
 
 def avoid(clock, fps, screen, hp=76):
     screen.fill([0, 0, 0])
@@ -162,7 +185,7 @@ def avoid(clock, fps, screen, hp=76):
     screen.blit(state_bar.surface, state_bar_pos)
 
     #初始化avoid_scene
-    avoid_scene = Avoid_Scene([10,8,1,1],(400, 400), hp, [200, 200])
+    avoid_scene = Avoid_Scene([20,8,3,1],(400, 400), hp, [200, 200])
     avoid_scene_pos = [400-avoid_scene.f_size[0]//2,
                        state_bar_pos[1]-avoid_scene.f_size[1]-10]
     screen.blit(avoid_scene.full_area_surface, avoid_scene_pos)
@@ -207,10 +230,18 @@ def avoid(clock, fps, screen, hp=76):
         screen.blit(avoid_scene.full_area_surface, avoid_scene_pos)
         screen.blit(state_bar.surface, state_bar_pos)
         pygame.display.flip()
+
         if time.time()-start_time >= finish_time:
-            pygame.mixer.music.stop()
+            pygame.mixer.music.fadeout(800)
             Running = False
             return avoid_scene.heart.HP
+        
+        elif avoid_scene.heart.is_dead():
+            pygame.mixer.music.stop()
+            die(screen)
+            Running = False
+            return 76
+
 
 
 def fight(clock, fps, screen):

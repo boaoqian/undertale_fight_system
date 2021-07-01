@@ -9,7 +9,7 @@ class TextClass:
         text = font.render(text, 0, color)
         t_rect = text.get_rect()
         #画框
-        w = 20  # 框宽
+        w = 16  # 框宽
         self.img = pygame.surface.Surface((t_rect[-2]+w,t_rect[-1]+w))
         self.rect = self.img.get_rect()
         pygame.draw.rect(self.img, color, self.rect,w//4)
@@ -65,10 +65,6 @@ class Menu_Text:
             text_img = self.font.render(t, 0, self.color)
             self.text_surface.blit(text_img,self.text_pos)
         self.surface.blit(self.text_surface,[10,10])
-        
-
-
-      
 
 class State_Bar:
     def __init__(self,lv=23,hp=[76,76]):
