@@ -13,7 +13,7 @@ class Basic_bullet(pygame.sprite.Sprite):
         self.bullet = pygame.surface.Surface([self.size]*2)  # 子弹图像
         self.available_area = available_area
         #self.speed = np.array([random.randrange(-10, 10), random.randrange(-10, 10)])
-        self.speed = 7
+        self.speed = 6
         pygame.draw.circle(self.bullet,color,[size/2]*2,size/2,0)
         self.out = False
 
@@ -44,7 +44,7 @@ class Basic_bullet(pygame.sprite.Sprite):
             return False
 
     def action(self, surface ,heart_pos):
-        speed = -(self.pos-heart_pos)/np.linalg.norm(self.pos-heart_pos)+np.random.rand(2)
+        speed = -(self.pos-heart_pos)/np.linalg.norm(self.pos-heart_pos)+np.random.rand(2)*np.random.randint(-1,2,size=2)
         self.pos += speed*self.speed
         for i, p in enumerate(self.pos):
             if p < self.available_area[i] or p > self.available_area[i+2]:

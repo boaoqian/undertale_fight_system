@@ -189,7 +189,7 @@ def animation(pos1, pos2, screen, times):
         pos = [pos1[0]-d_x*i, pos1[1]-d_y*i, pos1[2]-d_w*i, pos1[3]-d_h*i]
         pygame.draw.rect(screen,[255,255,255],pos,5)
         pygame.display.flip()
-        pygame.time.delay(30)
+        pygame.time.delay(10)
 
 
 def avoid(clock, fps, screen,hp=76):
@@ -199,7 +199,7 @@ def avoid(clock, fps, screen,hp=76):
     screen.blit(state_bar.surface, state_bar_pos)
 
     # 初始化avoid_scene
-    avoid_scene = Avoid_Scene([10, 12, 1, 0], (400, 400), hp, [200, 200])
+    avoid_scene = Avoid_Scene([10, 10, 3, 1], (400, 400), hp, [200, 200])
     avoid_scene_pos = [400-avoid_scene.f_size[0]//2,
                        state_bar_pos[1]-avoid_scene.f_size[1]-10]
     screen.blit(avoid_scene.full_area_surface, avoid_scene_pos)
@@ -275,7 +275,7 @@ def fight(clock,fps,screen):
     pos = [50,setting.pos['state_bar_pos'][-1]-surface.get_rect()[-1]-10]
 
     surface.blit(target,[0,0])
-    pygame.draw.rect(surface,[255,255,255],[start,0,10,150])
+    pygame.draw.rect(surface,[255,255,255],[start,15,10,120])
     pygame.draw.rect(screen,[0,0,0],[0,0,800,setting.pos['state_bar_pos'][-1]-1])
     screen.blit(surface,pos)
     pygame.display.flip()
@@ -288,7 +288,7 @@ def fight(clock,fps,screen):
         surface.fill([0,0,0])
         pygame.draw.rect(surface,[255,255,255],surface.get_rect(),5)
         surface.blit(target,[0,0])
-        pygame.draw.rect(surface,[255,255,255],[start,0,10,150])
+        pygame.draw.rect(surface,[255,255,255],[start,15,10,120])
         screen.blit(surface,pos)
         pygame.display.flip()
         for event in pygame.event.get():

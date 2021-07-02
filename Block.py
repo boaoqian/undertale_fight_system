@@ -161,15 +161,18 @@ class Avoid_Scene:
         self.full_area_surface.fill([0,0,0])
         pygame.draw.rect(self.surface,[255,255,255],(0,0,self.size[0],self.size[1]),5) #surface,color,pos,widht
         pos = self.heart.target_pos(self.heart.pos)
-
+        if self.heart.Invincible > 0:
+            self.heart.Invincible -= 1
         # 子弹更新
         for i, bullet in enumerate(self.bullet_group):
-            if bullet.collision(self.heart.pos):
-                if self.bullet_set[3]:
-                    self.bullet_group[i].out = True
-                self.heart.HP -= self.bullet_set[2]
-                self.playerdamaged.stop()
-                self.playerdamaged.play()
+            if self.heart.Invincible <= 0:
+                if bullet.collision(self.heart.pos):
+                    if self.bullet_set[3]:
+                        self.heart.Invincible += 5
+                        self.bullet_group[i].out = True
+                    self.heart.HP -= self.bullet_set[2]
+                    self.playerdamaged.stop()
+                    self.playerdamaged.play()
                 
             if bullet.out:
                 bullet = Basic_bullet(self.available_area, self.bullet_size)
