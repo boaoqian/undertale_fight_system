@@ -27,7 +27,7 @@ def main(screen, clock, fps):
     hp = 76
     starting(clock,fps,screen)
     while True:
-        selet = menu(clock,fps,screen,hp=[hp,76])
+        selet = menu(clock,fps,screen, 'welcome player',hp=[hp,76])
         scene[selet](clock,fps,screen)
         hp = avoid(clock,fps,screen,hp)
 

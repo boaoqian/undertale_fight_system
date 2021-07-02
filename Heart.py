@@ -3,6 +3,7 @@ import pygame
 class Heart(pygame.sprite.Sprite):
     def __init__(self, imgfile, hp, pos=[]):
         super().__init__()
+
         self.heart_img = pygame.image.load(imgfile)
         self.rect = self.heart_img.get_rect()
         self.pos = pos

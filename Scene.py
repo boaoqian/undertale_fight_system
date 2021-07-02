@@ -5,8 +5,12 @@ from Block import *
 from Heart import *
 import time
 import numpy as np
-# 开场白
 
+class Setting:
+    def __init__(self) -> None:
+        self.pos={}
+
+setting = Setting()
 
 def starting(clock, fps, screen):
     font = pygame.font.Font('Static/8bitoperator_jve.ttf', 40)
@@ -82,7 +86,7 @@ def quit_now():
             pygame.quit()
 
 
-def menu(clock, fps, screen, lv=23, hp=[76, 76]):
+def menu(clock, fps, screen, text, lv=23, hp=[76, 76]):
 
     font = pygame.font.Font('Static/8bitoperator_jve.ttf', 40)
     MenuSelect = pygame.mixer.Sound('Static/MenuSelect.ogg')
@@ -96,6 +100,7 @@ def menu(clock, fps, screen, lv=23, hp=[76, 76]):
     state_bar = State_Bar(hp=hp)
     state_bar_pos = (40, 600-menu_h-60)  # 间隙10+hp_bar宽40+menu+10
     screen.blit(state_bar.surface, state_bar_pos)
+    setting.pos['state_bar_pos']=state_bar_pos
 
     clock.tick(fps)
     pygame.display.flip()
@@ -103,10 +108,12 @@ def menu(clock, fps, screen, lv=23, hp=[76, 76]):
     text_block = Menu_Text(font, 1)
     text_block_pos = [50, state_bar_pos[-1] -
                       text_block.rect[-1]]  # 位置hp_bar宽40-10-self.h
-    text = 'welcome to play'
-    text_block.write(text)
-    screen.blit(text_block.surface, text_block_pos)
-    pygame.display.flip()
+    
+    for l in text:
+        text_block.write_letter(l)
+        screen.blit(text_block.surface, text_block_pos)
+        pygame.display.flip()
+        pygame.time.delay(30)
 
     # 玩家时间
     Running = True
@@ -120,7 +127,6 @@ def menu(clock, fps, screen, lv=23, hp=[76, 76]):
                 if event.key == pygame.K_RETURN:
                     MenuSelect.play()
                     Running = False
-                    screen.fill([0, 0, 0])
                     pygame.display.flip()
                     return selet
 
@@ -137,7 +143,6 @@ def menu(clock, fps, screen, lv=23, hp=[76, 76]):
                 menu = op(font, selet)
                 menu_h = menu.get_rect()[-1]
                 screen.blit(menu, (40, 600-menu_h-10))
-                # screen.blit(state_bar.surface, state_bar_pos)
                 pygame.display.flip()
 
 
@@ -154,45 +159,55 @@ def avoid_draw():
     return surface
 
 # 躲避攻击的场景
+
+
 def die(screen):
-    screen.fill([0,0,0])
+    screen.fill([0, 0, 0])
     s = pygame.mixer.Sound('Static/HeartShatter.ogg')
     img = pygame.image.load('Static/red_heart.png')
     s_img = pygame.image.load('Static/s_heart.png')
-    
-    screen.blit(img,[390,290])
+
+    screen.blit(img, [390, 290])
     pygame.display.flip()
     pygame.time.delay(1000)
     s.play()
-    screen.fill([0,0,0])
-    screen.blit(s_img,[390,290])
+    screen.fill([0, 0, 0])
+    screen.blit(s_img, [390, 290])
     pygame.display.flip()
     pygame.time.delay(1500)
-    screen.fill([0,0,0])
+    screen.fill([0, 0, 0])
 
-def move(img,pos_0,pos_1,speed):
-    pass
 
-def animation(pos1,pos2,times):
+def animation(pos1, pos2, screen, times):
+    d_x = (pos1[0] - pos2[0])/times
+    d_y = (pos1[1] - pos2[1])/times
+    d_w = (pos1[2] - pos2[2])/times
+    d_h = (pos1[3] - pos2[3])/times
+    mask=[0,0,800,setting.pos['state_bar_pos'][-1]+60]
     for i in range(times):
-        pass
-            
+        pygame.draw.rect(screen,[0,0,0],mask,0)
+        pos = [pos1[0]-d_x*i, pos1[1]-d_y*i, pos1[2]-d_w*i, pos1[3]-d_h*i]
+        pygame.draw.rect(screen,[255,255,255],pos,5)
+        pygame.display.flip()
+        pygame.time.delay(30)
 
-def avoid(clock, fps, screen, hp=76):
+
+def avoid(clock, fps, screen,hp=76):
     screen.fill([0, 0, 0])
     state_bar = State_Bar(hp=[hp, 76])
     state_bar_pos = (40, 600-60)  # 间隙10+hp_bar宽
     screen.blit(state_bar.surface, state_bar_pos)
 
-    #初始化avoid_scene
-    avoid_scene = Avoid_Scene([20,8,3,1],(400, 400), hp, [200, 200])
+    # 初始化avoid_scene
+    avoid_scene = Avoid_Scene([10, 12, 1, 0], (400, 400), hp, [200, 200])
     avoid_scene_pos = [400-avoid_scene.f_size[0]//2,
                        state_bar_pos[1]-avoid_scene.f_size[1]-10]
     screen.blit(avoid_scene.full_area_surface, avoid_scene_pos)
     pygame.mixer.music.load('Static/MEGALOVANIA.wav')
     pygame.mixer.music.play()
+
     start_time = time.time()
-    finish_time = 10 # 游戏时间
+    finish_time =  10# 游戏时间
     clock.tick(fps)
     pygame.display.flip()
 
@@ -232,10 +247,13 @@ def avoid(clock, fps, screen, hp=76):
         pygame.display.flip()
 
         if time.time()-start_time >= finish_time:
-            pygame.mixer.music.fadeout(800)
+            pygame.mixer.music.fadeout(1000)
+            pos1 = [avoid_scene_pos[0], avoid_scene_pos[1], avoid_scene.f_size[0],avoid_scene.f_size[1]]
+            pos2 = [50,284,700,200]
+            animation(pos1,pos2,screen,30)
             Running = False
             return avoid_scene.heart.HP
-        
+
         elif avoid_scene.heart.is_dead():
             pygame.mixer.music.stop()
             die(screen)
@@ -243,9 +261,48 @@ def avoid(clock, fps, screen, hp=76):
             return 76
 
 
+def fight(clock,fps,screen):
+    sound = pygame.mixer.Sound('Static/playerfight.ogg')
+    target = pygame.image.load('Static/target.png')
 
-def fight(clock, fps, screen):
-    pass
+    surface = pygame.surface.Surface(target.get_rect()[-2:])
+    pygame.draw.rect(surface,[255,255,255],surface.get_rect(),5)
+
+    start = 0
+    final = target.get_rect()[2]
+    times = 50
+    d_x = (final-start)/times
+    pos = [50,setting.pos['state_bar_pos'][-1]-surface.get_rect()[-1]-10]
+
+    surface.blit(target,[0,0])
+    pygame.draw.rect(surface,[255,255,255],[start,0,10,150])
+    pygame.draw.rect(screen,[0,0,0],[0,0,800,setting.pos['state_bar_pos'][-1]-1])
+    screen.blit(surface,pos)
+    pygame.display.flip()
+    pygame.time.delay(500)
+    hit = False
+    for _ in range(times):
+        if hit:
+            break
+        start += d_x
+        surface.fill([0,0,0])
+        pygame.draw.rect(surface,[255,255,255],surface.get_rect(),5)
+        surface.blit(target,[0,0])
+        pygame.draw.rect(surface,[255,255,255],[start,0,10,150])
+        screen.blit(surface,pos)
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                Running = False
+                pygame.quit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    sound.play()
+                    pygame.time.delay(500)
+                    hit = True
+
+        clock.tick(fps)
+
 
 
 def act(clock, fps, screen):

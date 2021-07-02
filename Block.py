@@ -97,9 +97,9 @@ class State_Bar:
         self.surface.blit(hp_text,[self.text_bar_w[1],0])
 
 class Avoid_Scene:
-    def __init__(self,bullet_set=[10,8,1,0],size=[300,300],hp=76,pos=[150,150],bk=[50,50]) -> None:
+    def __init__(self,bullet_set=[10,8,1,1],size=[300,300],hp=76,pos=[150,150],bk=[50,50]) -> None:
         '''
-        bullet_set:[0]子弹个数[1]子弹大小[2]子弹伤害[3]帧伤(默认关闭)
+        bullet_set:[0]子弹个数[1]子弹大小[2]子弹伤害[3]帧伤(1:关闭)
         size: 区域大小
         pos: heart的初始位置\n
         self.surface是区块结果
@@ -166,7 +166,7 @@ class Avoid_Scene:
         for i, bullet in enumerate(self.bullet_group):
             if bullet.collision(self.heart.pos):
                 if self.bullet_set[3]:
-                    self.bullet_group[i].out
+                    self.bullet_group[i].out = True
                 self.heart.HP -= self.bullet_set[2]
                 self.playerdamaged.stop()
                 self.playerdamaged.play()
@@ -175,7 +175,7 @@ class Avoid_Scene:
                 bullet = Basic_bullet(self.available_area, self.bullet_size)
                 bullet.setup(self.surface,self.heart_size)
                 self.bullet_group[i] = bullet
-            bullet.action(self.surface)
+            bullet.action(self.surface,self.heart.pos)
         self.surface.blit(self.heart.heart_img,pos)
         self.full_area_surface.blit(self.surface,self.bk)
 
